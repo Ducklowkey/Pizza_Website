@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+body{
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ebf0 100%);
+  color: #2d3748;
+}
+a{
+  text-decoration: none;
+  color: inherit;
+}
+hr{
+  display: none;
+}
+.app-content{
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+.flex-col{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cursor{
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.cursor:hover{
+  transform: scale(1.1);
+}
