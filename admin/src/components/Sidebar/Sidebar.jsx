@@ -1,8 +1,34 @@
 import './Sidebar.css'
-import { assets } from '../../assets/assets'
+import { assets, url } from '../../assets/assets'
 import { NavLink } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const Sidebar = () => {
+  const [unansweredCount, setUnansweredCount] = useState(0)
+
+  // Fetch unanswered messages count
+  const fetchUnansweredCount = async () => {
+    try {
+      const response = await axios.get(`${url}/api/message/unanswered/count`)
+      if (response.data.success) {
+        setUnansweredCount(response.data.count)
+      }
+    } catch (error) {
+      console.error('Error fetching unanswered count:', error)
+    }
+  }
+
+  // Fetch on mount and refresh every 5 seconds
+  useEffect(() => {
+    fetchUnansweredCount()
+    const interval = setInterval(() => {
+      fetchUnansweredCount()
+    }, 5000) // Refresh every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className='sidebar'>
       <div className="sidebar-header">  
@@ -41,12 +67,14 @@ const Sidebar = () => {
           <h3>Analytics</h3>
         </NavLink>
         <NavLink 
-          to='/' 
+          to='/messages' 
           className={({ isActive }) => `sidebar-option ${isActive ? 'active' : ''}`}
         >
           <span className="material-symbols-outlined">mail</span>
           <h3>Messages</h3>
-          <span className="notification-badge">26</span>
+          {unansweredCount > 0 && (
+            <span className="notification-badge">{unansweredCount}</span>
+          )}
         </NavLink>
         <NavLink 
           to='/list' 

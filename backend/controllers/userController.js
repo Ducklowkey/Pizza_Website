@@ -76,4 +76,26 @@ const getAllUsers = async (req,res) => {
     }
 }
 
-export {loginUser, registerUser, getAllUsers}
+//get user data from token
+const getUserData = async (req,res) => {
+    try{
+        const { token } = req.headers;
+        if (!token) {
+            return res.json({success:false,message:"Token not provided"})
+        }
+        
+        const token_decode = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await userModel.findById(token_decode.id).select("-password");
+        
+        if (!user) {
+            return res.json({success:false,message:"User not found"})
+        }
+        
+        res.json({success:true, data:user})
+    } catch(error){
+        console.log(error);
+        res.json({success:false,message:"Error"})
+    }
+}
+
+export {loginUser, registerUser, getAllUsers, getUserData}
