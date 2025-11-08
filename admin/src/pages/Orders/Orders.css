@@ -1,6 +1,9 @@
 .order {
     width: calc(100% - 280px);
+    margin-left: 280px;
     padding: 40px 50px;
+    min-height: 100vh;
+    overflow-y: auto;
 }
 .order > h3 {
     font-size: 28px;
@@ -127,9 +130,10 @@
 .order-item select:focus {
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
-@media(max-width:1000px){
+@media(max-width:900px){
     .order {
-        width: 100%;
+        width: calc(100% - 80px);
+        margin-left: 80px;
         padding: 20px;
     }
     .order-item{

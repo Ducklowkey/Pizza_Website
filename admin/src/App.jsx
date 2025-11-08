@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from './components/Navbar/Navbar'
 import Sidebar from './components/Sidebar/Sidebar'
 import { Route, Routes } from 'react-router-dom'
+import DashBoard from './pages/DashBoard/DashBoard'
 import Add from './pages/Add/Add'
 import List from './pages/List/List'
 import Orders from './pages/Orders/Orders'
@@ -13,11 +14,12 @@ const App = () => {
   return (
     <div className='app'>
       <ToastContainer/>
-      <Navbar/>
+      {/* <Navbar/> */}
       <hr />
       <div className="app-content">
         <Sidebar/>
         <Routes>
+          <Route path="/dashboard" element={<DashBoard/>}/>
           <Route path="/add" element={<Add/>}/>
           <Route path="/list" element={<List/>}/>
           <Route path="/orders" element={<Orders/>}/>

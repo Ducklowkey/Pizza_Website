@@ -1,6 +1,9 @@
 .users {
     width: calc(100% - 280px);
+    margin-left: 280px;
     padding: 40px 50px;
+    min-height: 100vh;
+    overflow-y: auto;
 }
 .users > p {
     font-size: 28px;
@@ -57,7 +60,8 @@
 }
 @media(max-width:900px){
     .users {
-        width: 100%;
+        width: calc(100% - 80px);
+        margin-left: 80px;
         padding: 20px;
     }
     .users-table-format{
