@@ -1,12 +1,13 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './Add.css'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import './EditProduct.css'
 import { url } from '../../assets/assets';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const Add = () => {
+const EditProduct = () => {
   const navigate = useNavigate()
+  const { id } = useParams()
   const [data, setData] = useState({
     name: "",
     description: "",
@@ -17,41 +18,66 @@ const Add = () => {
   });
 
   const [images, setImages] = useState([null, null, null, null]);
+  const [existingImages, setExistingImages] = useState([null, null, null, null]);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [id]);
+
+  const fetchProduct = async () => {
+    try {
+      setFetching(true);
+      const response = await axios.get(`${url}/api/food/${id}`);
+      if (response.data.success) {
+        const product = response.data.data;
+        setData({
+          name: product.name || "",
+          description: product.description || "",
+          category: product.category || "Pizza",
+          price: product.price?.toString() || "",
+          quantity: "",
+          status: "Available"
+        });
+        // Set first image from existing product
+        if (product.image) {
+          const imageUrl = `${url}/images/${product.image}`;
+          setExistingImages([imageUrl, null, null, null]);
+        }
+      } else {
+        toast.error("Product not found");
+        navigate('/list');
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      toast.error("Error fetching product");
+      navigate('/list');
+    } finally {
+      setFetching(false);
+    }
+  }
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     setLoading(true);
     
     const formData = new FormData();
+    formData.append("id", id);
     formData.append("name", data.name);
     formData.append("description", data.description);
     formData.append("price", Number(data.price));
     formData.append("category", data.category);
     
-    // Use the first uploaded image
+    // Use the first uploaded image if available, otherwise keep existing
     if (images[0]) {
       formData.append("image", images[0]);
-    } else {
-      toast.error("Please upload at least one product image");
-      setLoading(false);
-      return;
     }
     
     try {
-      const response = await axios.post(`${url}/api/food/add`, formData);
+      const response = await axios.post(`${url}/api/food/update`, formData);
       if (response.data.success) {
         toast.success(response.data.message);
-        setData({
-          name: "",
-          description: "",
-          category: "Pizza",
-          price: "",
-          quantity: "",
-          status: "Available"
-        });
-        setImages([null, null, null, null]);
-        // Navigate back to list after 1 second
         setTimeout(() => {
           navigate('/list');
         }, 1000);
@@ -59,7 +85,7 @@ const Add = () => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error("Error adding product");
+      toast.error("Error updating product");
     } finally {
       setLoading(false);
     }
@@ -75,29 +101,53 @@ const Add = () => {
     const newImages = [...images];
     newImages[index] = file;
     setImages(newImages);
+    // Clear existing image at this index when new image is uploaded
+    const newExisting = [...existingImages];
+    newExisting[index] = null;
+    setExistingImages(newExisting);
+  }
+
+  const handleDiscard = () => {
+    if (window.confirm('Are you sure you want to discard changes?')) {
+      navigate('/list');
+    }
+  }
+
+  const getCategoryName = () => {
+    return data.category || 'Product';
+  }
+
+  if (fetching) {
+    return (
+      <div className='edit-product'>
+        <div className="loading-message">Loading product...</div>
+      </div>
+    );
   }
 
   return (
-    <div className='add'>
-      <div className="add-header">
+    <div className='edit-product'>
+      <div className="edit-product-header">
         <h1>Product</h1>
-        <div className="add-breadcrumb">
+        <div className="edit-product-breadcrumb">
           <span>Dashboard</span>
           <span className="breadcrumb-separator">›</span>
           <span>Product</span>
           <span className="breadcrumb-separator">›</span>
-          <span className="breadcrumb-active">Add Product</span>
+          <span>{getCategoryName()}</span>
+          <span className="breadcrumb-separator">›</span>
+          <span className="breadcrumb-active">Edit Product</span>
         </div>
       </div>
 
-      <div className="add-content">
-        <form className='add-form' onSubmit={onSubmitHandler}>
-          <div className="add-form-grid">
+      <div className="edit-product-content">
+        <form className='edit-product-form' onSubmit={onSubmitHandler}>
+          <div className="edit-product-form-grid">
             {/* Left Section: Product Information */}
-            <div className="add-section product-information">
+            <div className="edit-product-section product-information">
               <h2 className="section-title">Product Information</h2>
               <p className="section-description">
-                 
+                Lorem ipsum dolor sit amet consectetur. Non ac nulla aliquam aenean in velit mattis.
               </p>
 
               <div className="form-group">
@@ -186,10 +236,10 @@ const Add = () => {
             </div>
 
             {/* Right Section: Image Product */}
-            <div className="add-section image-product">
+            <div className="edit-product-section image-product">
               <h2 className="section-title">Image Product</h2>
               <p className="image-note">
-                Format photos SVG, PNG, or JPG (Max size 4mb)
+                Note: Format photos SVG, PNG, or JPG (Max size 4mb)
               </p>
 
               <div className="image-upload-grid">
@@ -199,6 +249,12 @@ const Add = () => {
                       {images[index] ? (
                         <img
                           src={URL.createObjectURL(images[index])}
+                          alt={`Product ${index + 1}`}
+                          className="uploaded-image"
+                        />
+                      ) : existingImages[index] ? (
+                        <img
+                          src={existingImages[index]}
                           alt={`Product ${index + 1}`}
                           className="uploaded-image"
                         />
@@ -231,8 +287,11 @@ const Add = () => {
           </div>
 
           <div className="form-actions">
-            <button type='submit' className='save-btn' disabled={loading}>
-              {loading ? 'Saving...' : 'Save Product'}
+            <button type='button' className='discard-btn' onClick={handleDiscard}>
+              Discard Changes
+            </button>
+            <button type='submit' className='save-changes-btn' disabled={loading}>
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
@@ -241,4 +300,5 @@ const Add = () => {
   )
 }
 
-export default Add
+export default EditProduct
+

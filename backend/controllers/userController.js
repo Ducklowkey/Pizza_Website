@@ -98,4 +98,61 @@ const getUserData = async (req,res) => {
     }
 }
 
-export {loginUser, registerUser, getAllUsers, getUserData}
+//add customer by admin
+const addCustomer = async (req, res) => {
+    const { name, email, phone, address, password, dateOfBirth } = req.body;
+    try {
+        // Check if user already exists
+        const exists = await userModel.findOne({ email });
+        if (exists) {
+            return res.json({ success: false, message: "Customer with this email already exists" });
+        }
+
+        // Validate email format
+        if (!validator.isEmail(email)) {
+            return res.json({ success: false, message: "Please enter a valid email" });
+        }
+
+        // Use provided password or default password
+        const userPassword = password || "123456789"; // Default password if not provided
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(userPassword, salt);
+
+        // Parse dateOfBirth if provided
+        let parsedDateOfBirth = null;
+        if (dateOfBirth) {
+            parsedDateOfBirth = new Date(dateOfBirth);
+        }
+
+        const newCustomer = new userModel({
+            name,
+            email,
+            password: hashedPassword,
+            phone: phone || "",
+            address: address || "",
+            dateOfBirth: parsedDateOfBirth,
+            purchases: 0,
+            orderQuantity: 0,
+            cartData: {}
+        });
+
+        const customer = await newCustomer.save();
+        res.json({ 
+            success: true, 
+            message: "Customer added successfully",
+            data: {
+                _id: customer._id,
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone,
+                address: customer.address,
+                dateOfBirth: customer.dateOfBirth
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error adding customer" });
+    }
+}
+
+export {loginUser, registerUser, getAllUsers, getUserData, addCustomer}

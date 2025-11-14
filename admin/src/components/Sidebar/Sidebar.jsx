@@ -60,13 +60,6 @@ const Sidebar = () => {
           <h3>Orders</h3>
         </NavLink>
         <NavLink 
-          to='/' 
-          className={({ isActive }) => `sidebar-option ${isActive ? 'active' : ''}`}
-        >
-          <span className="material-symbols-outlined">analytics</span>
-          <h3>Analytics</h3>
-        </NavLink>
-        <NavLink 
           to='/messages' 
           className={({ isActive }) => `sidebar-option ${isActive ? 'active' : ''}`}
         >
@@ -84,14 +77,7 @@ const Sidebar = () => {
           <h3>Products</h3>
         </NavLink>
         <NavLink 
-          to='/' 
-          className={({ isActive }) => `sidebar-option ${isActive ? 'active' : ''}`}
-        >
-          <span className="material-symbols-outlined">assessment</span>
-          <h3>Reports</h3>
-        </NavLink>
-        <NavLink 
-          to='/' 
+          to='/settings' 
           className={({ isActive }) => `sidebar-option ${isActive ? 'active' : ''}`}
         >
           <span className="material-symbols-outlined">settings</span>

@@ -9,10 +9,50 @@ const DashBoard = () => {
   const [totalExpenses, setTotalExpenses] = useState(0)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [selectedDate, setSelectedDate] = useState('10 / 21 / 2021')
+  const [adminName, setAdminName] = useState('Daniel')
+  const [profileImage, setProfileImage] = useState(assets.profile_image)
 
   useEffect(() => {
     fetchOrders()
+    fetchSettings()
+    
+    // Listen for settings updates
+    const handleStorageChange = () => {
+      fetchSettings()
+    }
+    
+    window.addEventListener('storage', handleStorageChange)
+    const interval = setInterval(() => {
+      if (localStorage.getItem('settingsUpdated')) {
+        fetchSettings()
+        localStorage.removeItem('settingsUpdated')
+      }
+    }, 1000)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
+    }
   }, [])
+
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get(`${url}/api/settings`)
+      if (response.data.success) {
+        const data = response.data.data
+        if (data.adminName) {
+          setAdminName(data.adminName)
+        }
+        if (data.profileImage) {
+          setProfileImage(`${url}/images/${data.profileImage}`)
+        } else {
+          setProfileImage(assets.profile_image)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    }
+  }
 
   const fetchOrders = async () => {
     try {
@@ -128,11 +168,11 @@ const DashBoard = () => {
           </div>
           <div className="user-info">
             <div className="user-text">
-              <p>Hey, Daniel</p>
+              <p>Hey, {adminName}</p>
               <small>Admin</small>
             </div>
             <div className="profile-photo">
-              <img src={assets.profile_image} alt="profile" />
+              <img src={profileImage} alt="profile" />
             </div>
           </div>
         </div>

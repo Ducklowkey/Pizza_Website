@@ -7,6 +7,7 @@ import 'dotenv/config'
 import cartRouter from "./routes/cartRoute.js"
 import orderRouter from "./routes/orderRoute.js"
 import messageRouter from "./routes/messageRoute.js"
+import settingsRouter from "./routes/settingsRoute.js"
 
 // app config
 const app = express()
@@ -27,6 +28,7 @@ app.use("/images",express.static('uploads'))
 app.use("/api/cart", cartRouter)
 app.use("/api/order",orderRouter)
 app.use("/api/message", messageRouter)
+app.use("/api/settings", settingsRouter)
 
 app.get("/", (req, res) => {
     res.send("API Working")

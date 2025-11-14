@@ -1,4 +1,4 @@
-.add {
+.edit-product {
     width: calc(100% - 280px);
     margin-left: 280px;
     padding: 40px 50px;
@@ -8,18 +8,18 @@
 }
 
 /* Header Section */
-.add-header {
+.edit-product-header {
     margin-bottom: 30px;
 }
 
-.add-header h1 {
+.edit-product-header h1 {
     font-size: 32px;
     font-weight: 800;
     color: #1e293b;
     margin-bottom: 12px;
 }
 
-.add-breadcrumb {
+.edit-product-breadcrumb {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -37,15 +37,15 @@
 }
 
 /* Content */
-.add-content {
+.edit-product-content {
     width: 100%;
 }
 
-.add-form {
+.edit-product-form {
     width: 100%;
 }
 
-.add-form-grid {
+.edit-product-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
@@ -53,7 +53,7 @@
 }
 
 /* Section Styles */
-.add-section {
+.edit-product-section {
     background: #ffffff;
     border-radius: 12px;
     padding: 30px;
@@ -216,10 +216,28 @@
 .form-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 12px;
     margin-top: 30px;
 }
 
-.save-btn {
+.discard-btn {
+    padding: 12px 32px;
+    background: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.discard-btn:hover {
+    background: #f1f5f9;
+    border-color: #2563eb;
+}
+
+.save-changes-btn {
     padding: 12px 32px;
     background: #3b82f6;
     color: #ffffff;
@@ -231,32 +249,39 @@
     transition: all 0.3s ease;
 }
 
-.save-btn:hover:not(:disabled) {
+.save-changes-btn:hover:not(:disabled) {
     background: #2563eb;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.save-btn:disabled {
+.save-changes-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
+.loading-message {
+    padding: 40px;
+    text-align: center;
+    color: #64748b;
+    font-size: 16px;
+}
+
 /* Responsive Design */
 @media(max-width: 1200px) {
-    .add-form-grid {
+    .edit-product-form-grid {
         grid-template-columns: 1fr;
     }
 }
 
 @media(max-width: 900px) {
-    .add {
+    .edit-product {
         width: calc(100% - 80px);
         margin-left: 80px;
         padding: 20px;
     }
 
-    .add-section {
+    .edit-product-section {
         padding: 20px;
     }
 
@@ -273,4 +298,14 @@
     .image-upload-grid {
         grid-template-columns: 1fr;
     }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .discard-btn,
+    .save-changes-btn {
+        width: 100%;
+    }
 }
+
