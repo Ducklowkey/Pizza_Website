@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import './PlaceOrder.css'
 import { StoreContext } from '../../Context/StoreContext'
-import { assets } from '../../assets/assets';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -19,6 +18,8 @@ const PlaceOrder = () => {
         country: "",
         phone: ""
     })
+
+    const [paymentMethod, setPaymentMethod] = useState("stripe"); // "stripe" or "cod"
 
     const { getTotalCartAmount, token, food_list, cartItems, url, setCartItems } = useContext(StoreContext);
 
@@ -44,11 +45,20 @@ const PlaceOrder = () => {
             address: data,
             items: orderItems,
             amount: getTotalCartAmount() + 5,
+            paymentMethod: paymentMethod
         }
         let response = await axios.post(url + "/api/order/place", orderData, { headers: { token } });
         if (response.data.success) {
-            const { session_url } = response.data;
-            toast.success("Order Success!")
+            if (paymentMethod === "stripe") {
+                const { session_url } = response.data;
+                // Redirect to Stripe checkout
+                window.location.href = session_url;
+            } else if (paymentMethod === "cod") {
+                // For COD, navigate to orders page
+                toast.success("Order placed successfully! You will pay on delivery.")
+                setCartItems({});
+                navigate('/myorders');
+            }
         }
         else {
             toast.error("Something Went Wrong")
@@ -63,7 +73,7 @@ const PlaceOrder = () => {
         else if (getTotalCartAmount() === 0) {
             navigate('/cart')
         }
-    }, [token])
+    }, [token, getTotalCartAmount, navigate])
 
     return (
         <form onSubmit={placeOrder} className='place-order'>
@@ -96,7 +106,36 @@ const PlaceOrder = () => {
                         <div className="cart-total-details"><b>Total</b><b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 5}</b></div>
                     </div>
                 </div>
-                <button className='place-order-submit' type='submit'>Proceed To Payment</button>
+                
+                <div className="payment-method">
+                    <h3>Payment Method</h3>
+                    <div className="payment-options">
+                        <label className={`payment-option ${paymentMethod === "stripe" ? "active" : ""}`}>
+                            <input 
+                                type="radio" 
+                                name="paymentMethod" 
+                                value="stripe" 
+                                checked={paymentMethod === "stripe"}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                            />
+                            <span>💳 Pay Online (Stripe)</span>
+                        </label>
+                        <label className={`payment-option ${paymentMethod === "cod" ? "active" : ""}`}>
+                            <input 
+                                type="radio" 
+                                name="paymentMethod" 
+                                value="cod" 
+                                checked={paymentMethod === "cod"}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                            />
+                            <span>💰 Cash on Delivery</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button className='place-order-submit' type='submit'>
+                    {paymentMethod === "stripe" ? "Proceed To Payment" : "Place Order"}
+                </button>
             </div>
         </form>
     )

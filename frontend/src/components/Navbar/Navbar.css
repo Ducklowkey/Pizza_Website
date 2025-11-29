@@ -59,7 +59,11 @@ position: relative;
 
 .navbar-profile{
     position: relative;
+}
 
+.navbar-profile-img{
+    width: 22px;
+    cursor: pointer;
 }
 .navbar-profile-dropdown{
     position: absolute;
@@ -113,6 +117,10 @@ position: relative;
         width: 22px;
     }
 
+    .navbar-profile-img {
+        width: 22px;
+    }
+
     .navbar-right button {
         padding: 8px 25px;
     }
@@ -133,6 +141,10 @@ position: relative;
     }
 
     .navbar-right img {
+        width: 20px;
+    }
+
+    .navbar-profile-img {
         width: 20px;
     }
 

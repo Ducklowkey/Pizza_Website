@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import userModel from "../models/userModel.js";
+import fs from "fs";
 
 //create token
 const createToken = (id) => {
@@ -155,4 +156,67 @@ const addCustomer = async (req, res) => {
     }
 }
 
-export {loginUser, registerUser, getAllUsers, getUserData, addCustomer}
+//update user profile
+const updateUserProfile = async (req, res) => {
+    try {
+        const { token } = req.headers;
+        if (!token) {
+            return res.json({success: false, message: "Token not provided"});
+        }
+
+        const token_decode = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await userModel.findById(token_decode.id);
+
+        if (!user) {
+            return res.json({success: false, message: "User not found"});
+        }
+
+        // Update fields
+        if (req.body.name) user.name = req.body.name;
+        if (req.body.phone) user.phone = req.body.phone;
+        if (req.body.address) user.address = req.body.address;
+        if (req.body.dateOfBirth) user.dateOfBirth = new Date(req.body.dateOfBirth);
+
+        // Handle password change
+        if (req.body.newPassword) {
+            if (!req.body.currentPassword) {
+                return res.json({success: false, message: "Current password is required"});
+            }
+            
+            // Verify current password
+            const isMatch = await bcrypt.compare(req.body.currentPassword, user.password);
+            if (!isMatch) {
+                return res.json({success: false, message: "Current password is incorrect"});
+            }
+            
+            // Validate new password
+            if (req.body.newPassword.length < 8) {
+                return res.json({success: false, message: "New password must be at least 8 characters"});
+            }
+            
+            // Hash new password
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(req.body.newPassword, salt);
+        }
+
+        // Handle image upload
+        if (req.file) {
+            // Delete old image if exists
+            if (user.image) {
+                const oldImagePath = `uploads/${user.image}`;
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
+            }
+            user.image = req.file.filename;
+        }
+
+        await user.save();
+        res.json({success: true, message: "Profile updated successfully", data: user});
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message: "Error updating profile"});
+    }
+}
+
+export {loginUser, registerUser, getAllUsers, getUserData, addCustomer, updateUserProfile}
