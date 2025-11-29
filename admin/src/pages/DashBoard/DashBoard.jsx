@@ -4,11 +4,19 @@ import { assets, url } from '../../assets/assets'
 import axios from 'axios'
 
 const DashBoard = () => {
+  // Format date to MM / DD / YYYY
+  const formatDate = (date) => {
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const year = date.getFullYear()
+    return `${month} / ${day} / ${year}`
+  }
+
   const [orders, setOrders] = useState([])
   const [totalSales, setTotalSales] = useState(0)
   const [totalExpenses, setTotalExpenses] = useState(0)
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [selectedDate, setSelectedDate] = useState('10 / 21 / 2021')
+  const [selectedDate, setSelectedDate] = useState(formatDate(new Date()))
   const [adminName, setAdminName] = useState('Daniel')
   const [profileImage, setProfileImage] = useState(assets.profile_image)
 
@@ -75,27 +83,14 @@ const DashBoard = () => {
 
   const totalIncome = totalSales - totalExpenses
 
-  // Recent updates data (mock data - you can replace with real data)
-  const recentUpdates = [
-    {
-      name: 'Mike Tyson',
-      action: 'received his order of Night lion tech GPS drone.',
-      time: '2 Minutes Ago',
-      avatar: assets.profile_image
-    },
-    {
-      name: 'Diana Ayi',
-      action: 'declined her order of 2 DJI Air 2S.',
-      time: '5 Minutes Ago',
-      avatar: assets.profile_image
-    },
-    {
-      name: 'Mandy Roy',
-      action: 'received his order of LARVENDER KF102 Drone.',
-      time: '6 Minutes Ago',
-      avatar: assets.profile_image
-    }
-  ]
+  // Calculate percentages based on target values
+  const salesTarget = 1000
+  const expensesTarget = 530
+  const incomeTarget = 470
+
+  const salesPercent = Math.min(Math.round((totalSales / salesTarget) * 100), 100)
+  const expensesPercent = Math.min(Math.round((totalExpenses / expensesTarget) * 100), 100)
+  const incomePercent = Math.min(Math.round((totalIncome / incomeTarget) * 100), 100)
 
   // Sales analytics data
   const salesAnalytics = [
@@ -188,12 +183,15 @@ const DashBoard = () => {
             <div className="card-info">
               <h3>Total Sales</h3>
               <h2>${totalSales.toLocaleString()}</h2>
-              <small>Last 24 Hours</small>
+              <small>Last 30 days</small>
             </div>
           </div>
           <div className="card-chart">
-            <div className="donut-chart purple" data-percent="81">
-              <span>81%</span>
+            <div 
+              className="donut-chart purple" 
+              style={{ '--percent': salesPercent }}
+            >
+              <span>{salesPercent}%</span>
             </div>
           </div>
         </div>
@@ -206,12 +204,15 @@ const DashBoard = () => {
             <div className="card-info">
               <h3>Total Expenses</h3>
               <h2>${totalExpenses.toLocaleString()}</h2>
-              <small>Last 24 Hours</small>
+              <small>Last 30 Days</small>
             </div>
           </div>
           <div className="card-chart">
-            <div className="donut-chart blue" data-percent="62">
-              <span>62%</span>
+            <div 
+              className="donut-chart blue" 
+              style={{ '--percent': expensesPercent }}
+            >
+              <span>{expensesPercent}%</span>
             </div>
           </div>
         </div>
@@ -224,12 +225,15 @@ const DashBoard = () => {
             <div className="card-info">
               <h3>Total Income</h3>
               <h2>${totalIncome.toLocaleString()}</h2>
-              <small>Last 24 Hours</small>
+              <small>Last 30 days</small>
             </div>
           </div>
           <div className="card-chart">
-            <div className="donut-chart purple" data-percent="44">
-              <span>44%</span>
+            <div 
+              className="donut-chart purple" 
+              style={{ '--percent': incomePercent }}
+            >
+              <span>{incomePercent}%</span>
             </div>
           </div>
         </div>
@@ -265,26 +269,6 @@ const DashBoard = () => {
             ))}
           </div>
           <a href="#" className="show-all">Show All</a>
-        </div>
-
-        {/* Recent Updates */}
-        <div className="dashboard-card recent-updates">
-          <h2>Recent Updates</h2>
-          <div className="updates-list">
-            {recentUpdates.map((update, index) => (
-              <div key={index} className="update-item">
-                <div className="profile-photo">
-                  <img src={update.avatar} alt={update.name} />
-                </div>
-                <div className="update-content">
-                  <p>
-                    <b>{update.name}</b> {update.action}
-                  </p>
-                  <small>{update.time}</small>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Sales Analytics */}

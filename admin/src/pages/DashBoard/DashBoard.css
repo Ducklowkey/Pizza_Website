@@ -193,6 +193,7 @@
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--color-dark);
+  --percent: 0;
 }
 
 .donut-chart::before {
@@ -201,43 +202,34 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 8px solid var(--color-info-light);
-  box-sizing: border-box;
+  background: conic-gradient(
+    var(--chart-color) 0deg,
+    var(--chart-color) calc(var(--percent) * 3.6deg),
+    var(--color-info-light) calc(var(--percent) * 3.6deg),
+    var(--color-info-light) 360deg
+  );
+  mask: radial-gradient(circle at center, transparent 28px, black 28px);
+  -webkit-mask: radial-gradient(circle at center, transparent 28px, black 28px);
 }
 
-.donut-chart.purple::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid transparent;
-  border-top-color: var(--color-primary);
-  border-right-color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-  box-sizing: border-box;
-  transform: rotate(-45deg);
-  clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 0% 50%, 0% 0%);
+.donut-chart.purple {
+  --chart-color: var(--color-primary);
 }
 
-.donut-chart.blue::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid transparent;
-  border-top-color: #3b82f6;
-  border-right-color: #3b82f6;
-  border-bottom-color: #3b82f6;
-  box-sizing: border-box;
-  transform: rotate(-45deg);
-  clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 0% 50%, 0% 0%);
+.donut-chart.blue {
+  --chart-color: #3b82f6;
 }
 
 .donut-chart span {
   position: relative;
   z-index: 1;
+  background: var(--color-white);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Dashboard Grid */
